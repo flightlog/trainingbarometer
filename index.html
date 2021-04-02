@@ -1,0 +1,93 @@
+
+<!doctype html>
+<html>
+<head>
+	<title>FLS Barometer</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="FLS Barometer Sample">
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<script src="js/jquery.min.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<link href="css/barometer.css" rel="stylesheet">
+</head>
+
+<body onload="bodyonload();">
+
+<div class="container">
+
+	<div class="row my-5">
+	  <div class="col-12 mb-5 text-center">
+	          <div id="hoursDiv" style='float: left;'></div>
+	          <div id="startsDiv" style="float: left; padding-left: 12px;"></div>
+						<svg id="svg">
+							<line id="line" stroke='black'/>
+							<circle id="statusPoint" cx="110" cy="335" r="6" stroke="black" stroke-width="7" fill="white" />
+						</svg>
+	      </div>
+	  </div>
+	</div>
+
+</div>
+
+<script>
+
+		for (var i = 30; i >= 0; i--) {
+			var colorClass = i <= 10 ? "bar-red" : (i > 10 && i <= 20 ? "bar-yellow" : (i > 20 ? "bar-green" : ""));
+			if (i % 3 == 0) {
+				$("#hoursDiv").append("<div id='l"+i+"'><span class='span-width'>"+i+"</span><span class='"+colorClass+"'>&nbsp;</span></div>");
+			} else {
+				$("#hoursDiv").append("<div id='l"+i+"'><span class='span-width'>&nbsp;</span><span class='"+colorClass+"'>&nbsp;</span></div>");
+			}
+		}
+
+		for (var i = 45; i >= 0; i = i - 1.5) {
+			if (i % 3 == 0) {
+				var divId = i.toString().replace(".","");
+				$("#startsDiv").append("<div id='r"+divId+"'><span class='span-right-width'>"+i+"</span></div>");
+			} else {
+				$("#startsDiv").append("<div id='r"+divId+"'><span class='span-right-width'>&nbsp;</span></div>");
+			}
+		}
+
+		function bodyonload() {
+				var urlParams = new URLSearchParams(window.location.search);
+				if (urlParams.has('hours') && urlParams.has('starts')) {
+					var hours = urlParams.get('hours');
+					var starts = urlParams.get('starts');
+					if (!isNaN(hours) && !isNaN(starts) && Number(hours) <= 30 && Number(starts) <= 45) {
+						if (Number(starts) % 1.5 != 0) {
+							var ded = 0.0;
+							if ((Number(starts) + 0.5) % 1.5 == 0) {
+								ded = 0.5;
+							}
+							if ((Number(starts) - 0.5) % 1.5 == 0) {
+								ded = -0.5;
+							}
+							starts = Number(starts) + ded;
+						}
+						var startsString = "" + starts;
+						var line = $("#line");
+						var div1 = $("#l"+hours);
+						var div2 = $("#r"+startsString.replace(".",""));
+						var pos1 = div1.position();
+						var pos2 = div2.position();
+						var x1 = pos1.left + 32;
+						var y1 = pos1.top + 10;
+						var x2 = pos2.left - 13;
+						var y2 = pos2.top + 17;
+						line.attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2);
+						document.getElementById("statusPoint").setAttribute("cy", (y1 + y2) / 2);
+					}
+				}  else {
+					window.location = "index.html?hours=27&starts=9";
+				}
+		}
+
+</script>
+
+</body>
+
+</html>
